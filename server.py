@@ -1,37 +1,26 @@
-from bottle import route, run, template, request, post
+from bottle import route, run, template, request, post, view, static_file
 
 import query
 
 context = None
 
 @route('/')
+@view('index')
 def index():
     global context
     response, context = query.query()
-    return template('''
-        <p><strong>Hello! I can record the BPM of a song or play a song at a given BPM.</strong></p>
-        <p>{{response}}</p>
-        <form action="/command" method="post">
-            <label>
-                <input style="width: 200px" type="text" name="command">
-            </label>
-            <input type="submit">
-        </form>
-    ''', response=response)
+    return template('index', response=response)
 
 @post('/command')
 def command():
     global context
     command = request.forms.get('command')
     response, context = query.query(command, context)
-    return template('''
-        <p>{{response}}</p>
-        <form action="/command" method="post">
-            <label>
-                <input style="width: 200px" type="text" name="command">
-            </label>
-            <input type="submit">
-        </form>
-    ''', response=response)
+    frontend = context and context.get('frontend')
+    return { 'message': response, 'frontend': frontend }
 
-run(host='0.0.0.0', port=8080)
+@route('/music/<filename>')
+def music_static(filename):
+    return static_file(filename, root='music/')
+
+run(host='0.0.0.0', port=8080, server='paste')
