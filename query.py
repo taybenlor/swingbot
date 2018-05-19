@@ -1,9 +1,8 @@
 import bpm
-import player
 
 def playing(command, context):
 	if 'bpm' in command.lower():
-		before, after = command.split('bpm')
+		before, after = command.lower().split('bpm')
 		tempo_string = before.split()[-1]
 		try:
 			tempo = int(tempo_string)
@@ -23,7 +22,7 @@ def telling(command, context):
 def recording(command, context):
 	song = context['song_name']
 	if 'bpm' in command.lower():
-		before, after = command.split('bpm')
+		before, after = command.lower().split('bpm')
 		tempo_string = before.split()[-1]
 		try:
 			tempo = int(tempo_string)
