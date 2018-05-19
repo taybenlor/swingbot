@@ -8,8 +8,10 @@ def playing(command, context):
 		try:
 			tempo = int(tempo_string)
 			song = bpm.get_song(tempo)
-			player.play(song)
-			return f'Playing {song} at {tempo} BPM. Record a BPM? Or play a song?', None
+			return f'''
+				<audio src="/music/{song}.wav" autoplay controls></audio><br>
+				Playing {song} at {tempo} BPM. Record a BPM? Or play a song?
+			''', None
 		except ValueError:
 			return f'{tempo_string} doesn\'t seem like a number.', context
 	else:
@@ -53,7 +55,6 @@ def query(command=None, context=None):
 	elif 'play' in command.lower():
 		return 'How fast would you like your song to be?', { 'intent': 'playing' }
 	elif 'stop' in command.lower():
-		player.stop()
-		return 'Stopped. Record a BPM? Or play a song?', None
+		return 'Stopped. Record a BPM? Or play a song?', { 'frontend': 'stop' }
 	else:
 		return 'Sorry I don\'t understand. Record a BPM? Or play a song?', None
