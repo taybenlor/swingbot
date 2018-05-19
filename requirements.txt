@@ -1,0 +1,4 @@
+bottle
+paste
+requests
+pygame
