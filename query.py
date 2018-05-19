@@ -1,7 +1,7 @@
 import bpm
 import player
 
-def playing(command):
+def playing(command, context):
 	if 'bpm' in command.lower():
 		before, after = command.split('bpm')
 		tempo_string = before.split()[-1]
@@ -9,56 +9,51 @@ def playing(command):
 			tempo = int(tempo_string)
 			song = bpm.get_song(tempo)
 			player.play(song)
-			return f'Playing {song} at {tempo} BPM.', None
+			return f'Playing {song} at {tempo} BPM. Record a BPM? Or play a song?', None
 		except ValueError:
-			return f'{tempo_string} doesn\'t seem like a number.', 'playing'
+			return f'{tempo_string} doesn\'t seem like a number.', context
 	else:
-		return 'Please phrase your answer in BPM', 'playing'
+		return 'Please phrase your answer in BPM', context
 
-def recording(command):
-    if 'bpm' in command.lower():
-        before, after = command.split('bpm')
-        tempo_string = before.split()[-1]
-        try:
-            tempo = int(tempo_string)
-            recorded = bpm.set_song(song, tempo)
-            return f'Recorded {song} as being {tempo} BPM!', None
-        except ValueError:
-            return f'{tempo_string} doesn\'t seem like a number.', 'recording'
-    else:
-        return 'Please phrase your answer in BPM', 'recording'
+def telling(command, context):
+	return 'What is the BPM of the song?', { 'intent': 'recording', 'song_name': command }
 
+def recording(command, context):
+	song = context['song_name']
+	if 'bpm' in command.lower():
+		before, after = command.split('bpm')
+		tempo_string = before.split()[-1]
+		try:
+			tempo = int(tempo_string)
+			recorded = bpm.set_song(song, tempo)
+			return f'Recorded {song} as being {tempo} BPM! Record a BPM? Or play a song?', None
+		except ValueError:
+			return f'{tempo_string} doesn\'t seem like a number.', context
+	else:
+		return 'Please phrase your answer in BPM', context
 
 def query(command=None, context=None):
 	if command is None:
 		return 'Record a BPM? Or play a song?', None
 
-	if context == 'recording':
-		return recording(command)
+	if context is not None:
+		intent = context.get('intent')
 
-	if context == 'playing':
-		return playing(command)
+		if intent == 'recording':
+			return recording(command, context)
+
+		if intent == 'playing':
+			return playing(command, context)
+
+		if intent == 'telling':
+			return telling(command, context)
 
 	if 'record' in command.lower():
-		return 'Tell me the song:', 'recording'
+		return 'Tell me the song:', { 'intent': 'telling' }
 	elif 'play' in command.lower():
-		return 'How fast would you like your song to be?', 'playing'
+		return 'How fast would you like your song to be?', { 'intent': 'playing' }
 	elif 'stop' in command.lower():
 		player.stop()
-		return 'Stopped', None
+		return 'Stopped. Record a BPM? Or play a song?', None
 	else:
-		return 'Sorry I don\'t understand', None
-
-if __name__ == '__main__':
-	print('Hello! I can record the BPM of a song or play a song at a given BPM.')
-	while True:
-		choice = input('Record a BPM? Or play a song? ').lower()
-
-		if 'record' in choice.lower():
-			set_bpm()
-		elif 'play' in choice.lower():
-			query_bpm()
-		elif 'stop' in choice.lower():
-			player.stop()
-		else:
-			print('Sorry I don\'t understand')
+		return 'Sorry I don\'t understand. Record a BPM? Or play a song?', None

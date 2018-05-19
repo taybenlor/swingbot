@@ -1,4 +1,4 @@
-from bottle import route, run, template
+from bottle import route, run, template, request, post
 
 import query
 
@@ -7,14 +7,31 @@ context = None
 @route('/')
 def index():
     global context
-    greeting = 'Hello! I can record the BPM of a song or play a song at a given BPM.'
     response, context = query.query()
-    return template('<strong>{{greeting}}</strong><p>{{response}}</p>', greeting=greeting, response=response)
+    return template('''
+        <p><strong>Hello! I can record the BPM of a song or play a song at a given BPM.</strong></p>
+        <p>{{response}}</p>
+        <form action="/command" method="post">
+            <label>
+                <input style="width: 200px" type="text" name="command">
+            </label>
+            <input type="submit">
+        </form>
+    ''', response=response)
 
-@route('/<command>')
-def command(command):
+@post('/command')
+def command():
     global context
+    command = request.forms.get('command')
     response, context = query.query(command, context)
-    return template('<p>{{response}}</p>', response=response)
+    return template('''
+        <p>{{response}}</p>
+        <form action="/command" method="post">
+            <label>
+                <input style="width: 200px" type="text" name="command">
+            </label>
+            <input type="submit">
+        </form>
+    ''', response=response)
 
 run(host='0.0.0.0', port=8080)
