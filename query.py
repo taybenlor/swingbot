@@ -8,7 +8,7 @@ def playing(command, context):
 			tempo = int(tempo_string)
 			song = bpm.get_song(tempo)
 			return f'''
-				Playing {song} at {bpm} BPM.
+				Playing {song} at {tempo} BPM.
 <img src="empty.gif" onerror="play('{song}');this.parentNode.removeChild(this);" />
 				Record a BPM or play a song?
 			''', None
