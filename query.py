@@ -8,8 +8,9 @@ def playing(command, context):
 			tempo = int(tempo_string)
 			song = bpm.get_song(tempo)
 			return f'''
-				<audio src="/music/{song}.wav" autoplay controls></audio><br>
-				Playing {song} at {tempo} BPM. Record a BPM? Or play a song?
+				Playing {song} at {bpm} BPM.
+<img src="empty.gif" onerror="play('{song}');this.parentNode.removeChild(this);" />
+				Record a BPM or play a song?
 			''', None
 		except ValueError:
 			return f'{tempo_string} doesn\'t seem like a number.', context
