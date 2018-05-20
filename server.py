@@ -25,7 +25,6 @@ def command():
 def music_static(filename):
     return static_file(filename, root='music/')
 
-<<<<<<< HEAD
 @route('/google-assistant', method='ANY')
 def g_assistant():
     global context
